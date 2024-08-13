@@ -49,11 +49,12 @@ def leer_publicaciones_html(request: Request):
     session.close()
     return templates.TemplateResponse("index.html", {"request": request, "publicaciones": publicaciones})
 
-
+"""
 # Endpoint GET para mostrar el formulario de creación de publicaciones
 @app.get("/publicaciones/nueva/html/", response_class=HTMLResponse)
 def mostrar_formulario_creacion(request: Request):
     return templates.TemplateResponse("create_publicacion.html", {"request": request})
+"""
 
 # Endpoint POST para manejar el envío del formulario y crear una nueva publicación
 @app.post("/publicaciones/nueva/html/")
