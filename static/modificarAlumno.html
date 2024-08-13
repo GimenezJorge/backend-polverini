@@ -13,9 +13,7 @@
         <input type="text" id="apyn" name="apyn" required>
         
         <label for="idcurso">Curso:</label>
-        <select id="idcurso" name="idcurso" required>
-            <!-- Opciones se cargarán dinámicamente -->
-        </select>
+        <select id="idcurso" name="idcurso" required></select>
         
         <label for="fecnac">Fecha de Nacimiento:</label>
         <input type="date" id="fecnac" name="fecnac" required>
@@ -26,20 +24,6 @@
     </form>
 
     <script>
-        async function fetchAlumno(id) {
-            // Aquí se cargará el alumno al cargar la página
-            const response = await fetch(`http://127.0.0.1:8000/alumnos/${id}`);
-            const alumno = await response.json();
-
-            // Precargar valores en los campos del formulario
-            document.getElementById('apyn').value = ''; // Vacío por defecto
-            document.getElementById('idcurso').value = alumno.idcurso;
-            document.getElementById('fecnac').value = alumno.fecnac;
-
-            // Cargar los cursos en el dropdown
-            await fetchCursos();
-        }
-
         async function fetchCursos() {
             const response = await fetch('http://127.0.0.1:8000/cursos/');
             const cursos = await response.json();
@@ -87,12 +71,11 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const id = obtenerIdDesdeURL();
             if (id) {
-                await fetchAlumno(id);
                 document.getElementById('idalumno').value = id;
                 document.getElementById('modificarAlumnoForm').addEventListener('submit', actualizarAlumno);
+                await fetchCursos(); // Cargar los cursos en el dropdown
             }
         });
     </script>
 </body>
 </html>
-
