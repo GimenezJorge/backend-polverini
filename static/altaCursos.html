@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alta Curso</title>
+</head>
+<body>
+    <h1>Alta Cursos</h1>
+    <form id="cursoForm">
+        <label for="curso">Curso:</label>
+        <input type="text" id="curso" name="curso" required>
+        <button type="submit">Agregar Curso</button>
+    </form>
+    <script>
+        document.getElementById('cursoForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const curso = document.getElementById('curso').value;
+
+            try {
+                const response = await fetch('http://localhost:8000/cursos/nuevo/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ curso })
+                });
+                if (!response.ok) {
+                    throw new Error('Error al agregar curso');
+                }
+                alert('Curso agregado exitosamente');
+                window.location.href = 'index.html'; // Redirige a la página de inicio
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -10,9 +10,8 @@ Microsoft ODBC Driver 18 for SQL Server (x64) version 18.3.3.1
 Microsoft Visual C++ Redistributable (version 14.40.33810.0)
 '''
 
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import declarative_base, sessionmaker
-import pyodbc
+from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 
 server = r'DESKTOP-HL0DSTT'
@@ -23,62 +22,60 @@ connection_string = (
     '&TrustServerCertificate=yes'
 )
 
-'''
+
+"""
 # Pruebo la conexión
 try:
     engine = create_engine(connection_string)
     print("Conexión exitosa!")
 except Exception as e:
     print(f"Error al conectar a la base de datos: {e}")
-'''
+"""
 
 # Creo el motor de SQLAlchemy y declaro la clase base
 engine = create_engine(connection_string)
 Base = declarative_base()
 
+# Defino la clase Alumno (en base a la tabla de la base de datos)
+class Alumno(Base):
+    __tablename__ = 'alumnos'
 
-# Defino la clase Publicacion (en base a la tabla de la base de datos)
-class Publicacion(Base):
-    __tablename__ = 'publicaciones'
+    idalumno = Column(Integer, primary_key=True, autoincrement=True)
+    apyn = Column(String)
+    idcurso = Column(Integer, ForeignKey('cursos.idcurso'))
+    fecnac = Column(Date)
 
-    id_publicacion = Column(Integer, primary_key=True)
-    especie = Column(String(50))
-    nombre = Column(String(50))
-    descripcion = Column(String(300))
-    ubicacion = Column(String(100))
-    estado = Column(String(50))
-    telefono = Column(String(20))
+    # Relación con la tabla 'cursos'
+    curso = relationship('Curso', back_populates='alumnos')
+
 
     @classmethod
-    def mostrar_todas(cls):
+    def mostrar_todos(cls):
         session = sessionmaker(bind=engine)()
-        publicaciones = session.query(cls).all()
+        alumnos = session.query(cls).all()
         session.close()
-        return publicaciones
+        return alumnos
 
     @classmethod
-    def agregar_publicacion(cls, especie, nombre, descripcion, ubicacion, estado, telefono):
-        nueva_publicacion = cls(
-            especie=especie,
-            nombre=nombre,
-            descripcion=descripcion,
-            ubicacion=ubicacion,
-            estado=estado,
-            telefono=telefono
+    def agregar_alumno(cls, apyn, idcurso, fecnac):
+        nuevo_alumno = cls(
+            apyn=apyn,
+            idcurso=idcurso,
+            fecnac=fecnac
         )
         session = sessionmaker(bind=engine)()
-        session.add(nueva_publicacion)
+        session.add(nuevo_alumno)
         session.commit()
-        session.refresh(nueva_publicacion)
+        session.refresh(nuevo_alumno)
         session.close()
-        return nueva_publicacion
+        return nuevo_alumno
     
     @classmethod
-    def eliminar_publicacion(cls, publicacion_id):
+    def eliminar_alumno(cls, alumno_id):
         session = sessionmaker(bind=engine)()
-        publicacion = session.query(cls).filter_by(id_publicacion=publicacion_id).first()
-        if publicacion:
-            session.delete(publicacion)
+        alumno = session.query(cls).filter_by(idalumno=alumno_id).first()
+        if alumno:
+            session.delete(alumno)
             session.commit()
             session.close()
             return True
@@ -86,18 +83,46 @@ class Publicacion(Base):
         return False
         
     @classmethod
-    def modificar_publicacion(cls, publicacion_id, especie, nombre, descripcion, ubicacion, estado, telefono):
+    def modificar_alumno(cls, alumno_id, apyn, idcurso, fecnac):
         session = sessionmaker(bind=engine)()
-        publicacion = session.query(cls).filter_by(id_publicacion=publicacion_id).first()
-        if publicacion:
-            publicacion.especie = especie
-            publicacion.nombre = nombre
-            publicacion.descripcion = descripcion
-            publicacion.ubicacion = ubicacion
-            publicacion.estado = estado
-            publicacion.telefono = telefono
+        alumno = session.query(cls).filter_by(idalumno=alumno_id).first()
+        if alumno:
+            alumno.apyn = apyn
+            alumno.idcurso = idcurso
+            alumno.fecnac = fecnac
             session.commit()
             session.close()
             return True
         session.close()
         return False
+
+# Defino la clase Curso (en base a la tabla de la base de datos)
+class Curso(Base):
+    __tablename__ = 'cursos'
+
+    idcurso = Column(Integer, primary_key=True, autoincrement=True)
+    curso = Column(String)
+
+    # Relación inversa
+    alumnos = relationship('Alumno', back_populates='curso')
+
+    @classmethod
+    def agregar_curso(cls, curso):
+        nuevo_curso = cls(
+            curso=curso
+        )
+        session = sessionmaker(bind=engine)()
+        session.add(nuevo_curso)
+        session.commit()
+        session.refresh(nuevo_curso)
+        session.close()
+        return nuevo_curso
+    
+    @classmethod
+    def recuperar_cursos(cls):
+        session = sessionmaker(bind=engine)()
+        cursos = session.query(cls).all()
+        session.close()
+        return cursos
+    
+ 
