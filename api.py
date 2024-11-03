@@ -3,8 +3,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from sqlalchemy.orm import sessionmaker
-from main import Alumno, Curso, engine
-from model import AlumnoModel, CursoModel
+from main import Alumno, Curso, Proveedor, engine
+from model import AlumnoModel, CursoModel, ProveedorModel  # Asegúrate de que esta clase exista en model.py
 
 app = FastAPI()
 
@@ -22,8 +22,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 
 # Endpoint GET para obtener todos los alumnos en formato JSON
 @app.get("/alumnos/", response_model=List[AlumnoModel])
@@ -43,9 +41,6 @@ def agregar_alumno(alumno: AlumnoModel):
         return {"message": "Alumno creado exitosamente", "alumno": alumno_agregado}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-
-
 
 # Endpoint DELETE para eliminar un alumno
 @app.delete("/alumnos/{alumno_id}")
@@ -73,3 +68,38 @@ def agregar_curso(curso: CursoModel):
 def recuperar_cursos():
     cursos = Curso.recuperar_cursos()
     return cursos
+
+# Endpoint POST para agregar un proveedor
+@app.post("/proveedores/nuevo/")
+def agregar_proveedor(proveedor: ProveedorModel):
+    Proveedor.agregar_proveedor(
+        nombre=proveedor.nombre,
+        direccion=proveedor.direccion,
+        telefono=proveedor.telefono
+    )
+    return {"message": "Proveedor creado exitosamente"}
+
+
+# Endpoint GET para obtener todos los proveedores
+@app.get("/proveedores/", response_model=List[ProveedorModel])
+def obtener_proveedores():
+    proveedores = Proveedor.mostrar_todos()
+    return proveedores
+
+# Endpoint PUT para modificar un proveedor
+@app.put("/proveedores/{proveedor_id}")
+def modificar_proveedor(proveedor_id: int, proveedor_in: ProveedorModel):
+    try:
+        Proveedor.modificar_proveedor(proveedor_id, proveedor_in)
+        return {"message": "Proveedor modificado correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
+# Endpoint DELETE para eliminar un proveedor
+@app.delete("/proveedores/{proveedor_id}")
+def eliminar_proveedor(proveedor_id: int):
+    if not Proveedor.eliminar_proveedor(proveedor_id):
+        raise HTTPException(status_code=404, detail=f"Proveedor con id {proveedor_id} no encontrado")
+    return {"message": f"Proveedor con id {proveedor_id} eliminado correctamente"}

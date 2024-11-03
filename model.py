@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 from datetime import date
 
+
 class AlumnoModel(BaseModel):
     idalumno: int = None
     apyn: str
@@ -19,6 +20,16 @@ class AlumnoModel(BaseModel):
 class CursoModel(BaseModel):
     idcurso: int = None
     curso: str
+
+    class Config:
+        from_attributes = True
+
+
+class ProveedorModel(BaseModel):
+    idproveedor: int = None
+    nombre: str
+    direccion: str
+    telefono: str
 
     class Config:
         from_attributes = True

@@ -9,20 +9,33 @@ SQLAlchemy
 Microsoft ODBC Driver 18 for SQL Server (x64) version 18.3.3.1
 Microsoft Visual C++ Redistributable (version 14.40.33810.0)
 '''
-
+#CONEXION DE MI CASA:
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship, joinedload
-from model import AlumnoModel, CursoModel  # Si es necesario
+from model import AlumnoModel, CursoModel, ProveedorModel 
 from fastapi import HTTPException
 
-server = r'DESKTOP-HL0DSTT'
-database = 'dbbackend'
+server = r'DESKTOP-9IIVD9P\SQLEXPRESS'
+database = 'bdg3'
 
 connection_string = (
     f'mssql+pyodbc://@{server}/{database}?driver=ODBC+Driver+18+for+SQL+Server'
     '&TrustServerCertificate=yes'
 )
+"""
+#CONEXION DE LA ESCUELA:
+server = 'sqlserver\\sqlserver'
+database = 'bdg3'
+username = 'bdg3'
+password = 'bdg3'
+driver = 'ODBC Driver 18 for SQL Server'
 
+# Construcción de la cadena de conexión usando las variables
+connection_string = (
+    f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver={driver}'
+    '&TrustServerCertificate=yes'
+)
+"""
 
 """
 # Pruebo la conexión
@@ -37,6 +50,7 @@ except Exception as e:
 engine = create_engine(connection_string)
 Base = declarative_base()
 
+
 # Defino la clase Alumno (en base a la tabla de la base de datos)
 class Alumno(Base):
     __tablename__ = 'alumnos'
@@ -48,8 +62,6 @@ class Alumno(Base):
 
     # Relación con la tabla 'cursos'
     curso = relationship('Curso', back_populates='alumnos')
-
-
 
     @classmethod
     def mostrar_todos(cls):
@@ -102,9 +114,7 @@ class Alumno(Base):
         }
 
         return alumno_con_curso
-    
 
-    
     @classmethod
     def eliminar_alumno(cls, alumno_id):
         session = sessionmaker(bind=engine)()
@@ -154,7 +164,6 @@ class Curso(Base):
     # Relación inversa
     alumnos = relationship('Alumno', back_populates='curso')
 
-    
     @classmethod
     def agregar_curso(cls, curso):
         nuevo_curso = cls(
@@ -173,3 +182,70 @@ class Curso(Base):
         cursos = session.query(cls).all()
         session.close()
         return cursos
+
+# Defino la clase Proveedor (en base a la nueva tabla que deseas agregar)
+class Proveedor(Base):
+    __tablename__ = 'proveedores'
+
+    idproveedor = Column(Integer, primary_key=True, autoincrement=True)
+    nombre = Column(String)
+    direccion = Column(String)
+    telefono = Column(String)
+
+    @classmethod
+    def agregar_proveedor(cls, nombre: str, direccion: str, telefono: str):
+        nuevo_proveedor = cls(
+            nombre=nombre,
+            direccion=direccion,
+            telefono=telefono
+        )
+        session = sessionmaker(bind=engine)()
+        session.add(nuevo_proveedor)
+        session.commit()
+        session.refresh(nuevo_proveedor)
+        session.close()
+        return nuevo_proveedor
+
+    @classmethod
+    def mostrar_todos(cls):
+        session = sessionmaker(bind=engine)()
+        proveedores = session.query(cls).all()
+        session.close()
+        return proveedores
+
+    @classmethod
+    def eliminar_proveedor(cls, proveedor_id: int):
+        session = sessionmaker(bind=engine)()
+        proveedor = session.query(cls).filter_by(idproveedor=proveedor_id).first()
+        if proveedor:
+            session.delete(proveedor)
+            session.commit()
+            session.close()
+            return True
+        session.close()
+        return False
+
+    @classmethod
+    def modificar_proveedor(cls, proveedor_id: int, proveedor_in: ProveedorModel):
+        session = sessionmaker(bind=engine)()
+        proveedor_existente = session.query(cls).filter(cls.idproveedor == proveedor_id).one_or_none()
+        if not proveedor_existente:
+            session.close()
+            raise Exception(f"Proveedor con id {proveedor_id} no encontrado")
+        
+        # Actualiza los campos del proveedor existente
+        proveedor_existente.nombre = proveedor_in.nombre
+        proveedor_existente.direccion = proveedor_in.direccion
+        proveedor_existente.telefono = proveedor_in.telefono
+
+        session.commit()
+        session.refresh(proveedor_existente)
+        session.close()
+        
+        return ProveedorModel(
+            idproveedor=proveedor_existente.idproveedor,
+            nombre=proveedor_existente.nombre,
+            direccion=proveedor_existente.direccion,
+            telefono=proveedor_existente.telefono
+        )
+
