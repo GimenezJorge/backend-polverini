@@ -1,6 +1,9 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
 from database import engine, Base
+from models import LibroModel
+from Genero import Genero
+from fastapi import HTTPException
 
 class Libro(Base):
     __tablename__ = 'libros'
@@ -9,18 +12,31 @@ class Libro(Base):
     titulo = Column(String(255), nullable=False)
     autor = Column(String(100), nullable=False)
     isbn = Column(String(20), unique=True, nullable=False)
-    precio = Column(Float, nullable=False)
     stock = Column(Integer, nullable=False)
     id_genero = Column(Integer, ForeignKey('generos.id_genero'), nullable=False)
 
     # Relación con la tabla Genero
     genero = relationship("Genero", back_populates="libros")
-    listas_de_precios = relationship("ListaDePrecios", back_populates="libro")
+    lista_de_precios = relationship("ListaDePrecios", back_populates="libro")
     
     @classmethod
-    def agregar_libro(cls, titulo: str, autor: str, isbn: str, precio: float, stock: int, id_genero: int):
-        nuevo_libro = cls(titulo=titulo, autor=autor, isbn=isbn, precio=precio, stock=stock, id_genero=id_genero)
+    def agregar_libro(cls, libro_in: LibroModel):
         session = sessionmaker(bind=engine)()
+        genero_existente = session.query(Genero).filter(Genero.id_genero == libro_in.id_genero).one_or_none()
+        if not genero_existente:
+            session.close()            
+            raise HTTPException(status_code=400, detail=f"El género con id {libro_in.id_genero} no existe.")
+        
+        nuevo_libro = cls(
+            titulo=libro_in.titulo,
+            autor=libro_in.autor,
+            isbn=libro_in.isbn,
+            stock=libro_in.stock,
+            id_genero=libro_in.id_genero
+        )
+         
+        
+        
         session.add(nuevo_libro)
         session.commit()
         session.refresh(nuevo_libro)
@@ -28,7 +44,7 @@ class Libro(Base):
         return nuevo_libro
 
     @classmethod
-    def obtener_libros(cls):
+    def mostrar_todos(cls):
         session = sessionmaker(bind=engine)()
         libros = session.query(cls).all()
         session.close()

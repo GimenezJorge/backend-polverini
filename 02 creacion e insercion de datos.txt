@@ -1,0 +1,195 @@
+USE bdg3;
+
+CREATE TABLE editoriales (
+    id_editorial INT PRIMARY KEY IDENTITY(1,1),
+    nombre VARCHAR(100) NOT NULL,
+    razon_social VARCHAR(100), 
+    cuit VARCHAR(30), 
+    direccion VARCHAR(255),
+    telefono VARCHAR(20),   
+    mail VARCHAR(50), 
+);
+
+CREATE TABLE clientes (
+    id_cliente INT PRIMARY KEY IDENTITY(1,1),
+    nombre VARCHAR(100),
+    email VARCHAR(100),
+    telefono VARCHAR(20),
+    direccion VARCHAR(255)
+);
+
+
+CREATE TABLE generos (
+    id_genero INT PRIMARY KEY IDENTITY(1,1),
+    nombre VARCHAR(100)
+);
+
+
+CREATE TABLE libros (
+    id_libro INT PRIMARY KEY IDENTITY(1,1),
+    titulo VARCHAR(255),
+    autor VARCHAR(100),
+    isbn VARCHAR(20),
+    stock INT,
+    id_genero INT,
+    FOREIGN KEY (id_genero) REFERENCES generos(id_genero)
+);
+
+CREATE TABLE compra_editorial (
+    id_compra_editorial INT PRIMARY KEY IDENTITY(1,1),
+    id_editorial INT,
+    fecha DATE,
+    FOREIGN KEY (id_editorial) REFERENCES editoriales(id_editorial)
+);
+
+
+CREATE TABLE detalle_compra_editorial (
+    id_detalle INT PRIMARY KEY IDENTITY(1,1),
+    id_compra_editorial INT,
+    id_libro INT,
+    cantidad INT,
+    FOREIGN KEY (id_compra_editorial) REFERENCES compra_editorial(id_compra_editorial),
+    FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
+);
+
+CREATE TABLE lista_de_precios (
+    id_lista_precio INT PRIMARY KEY IDENTITY(1,1),
+    id_editorial INT,
+    id_libro INT,
+    precio MONEY,
+    FOREIGN KEY (id_editorial) REFERENCES editoriales(id_editorial),
+    FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
+);
+
+CREATE TABLE venta_cliente (
+    id_venta_cliente INT PRIMARY KEY IDENTITY(1,1),
+    id_cliente INT,
+    fecha DATE,
+    total FLOAT,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);
+
+CREATE TABLE detalle_venta_cliente (
+    id_detalle INT PRIMARY KEY IDENTITY(1,1),
+    id_venta_cliente INT,
+    id_libro INT,
+    cantidad INT,
+    FOREIGN KEY (id_venta_cliente) REFERENCES venta_cliente(id_venta_cliente),
+    FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
+);
+
+CREATE TABLE carrito (
+    id_carrito INT PRIMARY KEY IDENTITY(1,1),
+    id_cliente INT,
+    fecha DATE,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);
+
+
+CREATE TABLE detalle_carrito (
+    id_detalle INT PRIMARY KEY IDENTITY(1,1),
+    id_carrito INT,
+    id_libro INT,
+    cantidad INT,
+    FOREIGN KEY (id_carrito) REFERENCES carrito(id_carrito),
+    FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
+);
+
+-- Insertar generos
+INSERT INTO generos (nombre)
+VALUES ('Ficción'), ('No Ficción'), ('Ciencia'), ('Historia'), ('Fantasía');
+
+-- Insertar clientes
+INSERT INTO clientes (nombre, email, telefono, direccion)
+VALUES 
+    ('Juan Pérez', 'juan.perez@gmail.com', '1123456789', 'Calle de la Paz 120'),
+    ('Ana Gómez', 'ana.gomez@yahoo.com', '1198765432', 'Avenida Las Heras 5600'),
+    ('Carlos Rodríguez', 'carlos.rodriguez@hotmail.com', '1145612378', 'Calle España 143'),
+    ('Laura Martínez', 'laura.martinez@outlook.com', '1123165489', 'Bv. Oroño 2300'),
+    ('Pedro García', 'pedro.garcia@mail.com', '1132145789', 'Av. Independencia 560');
+
+-- Insertar editoriales
+INSERT INTO editoriales (nombre, razon_social, cuit, direccion, telefono, mail)
+VALUES 
+    ('Editorial Alianza', 'Editorial Alianza S.A.', '20-20123456-7', 'Av. Santa Fe 1234', '011-4321000', 'contacto@alianza.com.ar'),
+    ('Editorial Sudamericana', 'Sudamericana S.A.', '20-21234567-8', 'Calle 9 de Julio 4567', '011-44332211', 'ventas@sudamericana.com.ar'),
+    ('Editorial Planeta', 'Planeta S.A.', '20-22345678-9', 'Av. Corrientes 1123', '011-55443322', 'info@planeta.com.ar'),
+    ('Editorial Siglo XXI', 'Siglo XXI Editores', '20-23456789-0', 'Calle Libertador 2345', '0351-1234567', 'contacto@sigloxxi.com.ar'),
+    ('Editorial Eudeba', 'Eudeba S.A.', '20-24567890-1', 'Av. de Mayo 3000', '011-56667788', 'editorial@eudeba.com');
+
+-- Insertar libros
+INSERT INTO libros (titulo, autor, isbn, stock, id_genero)
+VALUES 
+    ('El túnel', 'Ernesto Sabato', '978-987-1234', 12, 4), 
+    ('Cien años de soledad', 'Gabriel García Márquez', '978-0307474728', 10, 1),
+    ('Breve historia de casi todo', 'Bill Bryson', '978-0385530925', 18, 3),
+    ('El nombre del viento', 'Patrick Rothfuss', '978-8401352836', 14, 5),
+    ('La sombra del viento', 'Carlos Ruiz Zafón', '978-8401399467', 22, 5);
+
+-- Insertar compras editoriales
+INSERT INTO compra_editorial (id_editorial, fecha)
+VALUES 
+    (1, '2024-01-12'),
+    (2, '2024-02-20'),
+    (3, '2024-03-15'),
+    (4, '2024-04-10'),
+    (5, '2024-05-05');
+
+-- Insertar detalle compra editorial
+INSERT INTO detalle_compra_editorial (id_compra_editorial, id_libro, cantidad)
+VALUES 
+    (1, 1, 10), 
+    (1, 2, 5),
+    (2, 3, 12),
+    (3, 4, 8),
+    (4, 5, 15);
+
+-- Insertar lista de precios
+INSERT INTO lista_de_precios (id_editorial, id_libro, precio)
+VALUES 
+    (1, 1, 350.00),  -- Editorial Alianza
+    (1, 2, 470.00),  -- Editorial Alianza
+    (2, 3, 530.00),  -- Editorial Sudamericana
+    (2, 4, 600.00),  -- Editorial Sudamericana
+    (3, 4, 620.00),  -- Editorial Planeta
+    (3, 5, 560.00),  -- Editorial Planeta
+    (4, 5, 590.00),  -- Editorial Siglo XXI
+    (5, 1, 360.00),  -- Editorial Eudeba
+    (5, 2, 480.00),  -- Editorial Eudeba
+    (5, 3, 520.00);  -- Editorial Eudeba
+
+-- Insertar ventas clientes
+INSERT INTO venta_cliente (id_cliente, fecha, total)
+VALUES 
+    (1, '2024-06-01', 1600.00),
+    (2, '2024-06-02', 1900.00),
+    (3, '2024-06-03', 2400.00),
+    (4, '2024-06-04', 1300.00),
+    (5, '2024-06-05', 3100.00);
+
+-- Insertar detalle venta cliente
+INSERT INTO detalle_venta_cliente (id_venta_cliente, id_libro, cantidad)
+VALUES 
+    (1, 1, 3),
+    (1, 2, 4),
+    (2, 3, 1),
+    (3, 4, 2),
+    (4, 5, 1);
+
+-- Insertar carritos
+INSERT INTO carrito (id_cliente, fecha)
+VALUES 
+    (1, '2024-07-01'),
+    (2, '2024-07-02'),
+    (3, '2024-07-03'),
+    (4, '2024-07-04'),
+    (5, '2024-07-05');
+
+-- Insertar detalle carrito
+INSERT INTO detalle_carrito (id_carrito, id_libro, cantidad)
+VALUES 
+    (1, 1, 2),
+    (1, 2, 1),
+    (2, 3, 3),
+    (3, 4, 2),
+    (4, 5, 1);

@@ -1,20 +1,15 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
-from Cliente import Cliente  # Asegúrate de tener la clase Cliente importada
+from Cliente import Cliente  
 from models import ClienteModel 
 
 router = APIRouter()
 
 # Endpoint POST para registrar un nuevo cliente
 @router.post("/clientes/nuevo/", tags=["Clientes"], summary="Registrar un nuevo cliente", description="Este endpoint crea un nuevo cliente en la base de datos.")
-def registrar_cliente(cliente: ClienteModel):
-    nuevo_cliente = Cliente.registrar_cliente(
-        nombre=cliente.nombre,
-        email=cliente.email,
-        telefono=cliente.telefono,
-        direccion=cliente.direccion
-    )
-    return {"message": "Cliente registrado exitosamente", "cliente": nuevo_cliente}
+def agregar_cliente(cliente: ClienteModel):
+    Cliente.agregar_cliente(cliente)
+    return {"message": "Cliente registrado exitosamente"}
 
 # Endpoint GET para obtener todos los clientes
 @router.get("/clientes/", response_model=List[ClienteModel], tags=["Clientes"], summary="Obtener todos los clientes", description="Este endpoint devuelve una lista de todos los clientes registrados en la base de datos.")
@@ -34,13 +29,8 @@ def obtener_cliente(cliente_id: int):
 @router.put("/clientes/{cliente_id}", tags=["Clientes"], summary="Modificar un cliente", description="Este endpoint modifica los datos de un cliente específico identificado por su ID.")
 def modificar_cliente(cliente_id: int, cliente_in: ClienteModel):
     try:
-        cliente_existente = Cliente.modificar_cliente(cliente_id, 
-            nombre=cliente_in.nombre,
-            email=cliente_in.email,
-            telefono=cliente_in.telefono,
-            direccion=cliente_in.direccion
-        )
-        return {"message": "Cliente modificado correctamente", "cliente": cliente_existente}
+        Cliente.modificar_cliente(cliente_id, cliente_in)
+        return {"message": "Cliente modificado correctamente"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -15,18 +15,18 @@ class Editorial(Base):
     telefono = Column(String)
     mail = Column(String)
 
-    listas_de_precios = relationship("ListaDePrecios", back_populates="editorial")
+    lista_de_precios = relationship("ListaDePrecios", back_populates="editorial")
 
     @classmethod
-    def agregar_editorial(cls, nombre: str, razon_social: str, cuit: str, direccion: str, telefono: str, mail: str):
+    def agregar_editorial(cls, editorial_in: EditorialModel):
         nueva_editorial = cls(
-            nombre=nombre,
-            razon_social=razon_social,
-            cuit=cuit,
-            direccion=direccion,
-            telefono=telefono,
-            mail=mail
-        )
+            nombre=editorial_in.nombre,
+            razon_social=editorial_in.razon_social,
+            cuit=editorial_in.cuit,
+            direccion=editorial_in.direccion,
+            telefono=editorial_in.telefono,
+            mail=editorial_in.mail
+        )        
         session = sessionmaker(bind=engine)()
         session.add(nueva_editorial)
         session.commit()
@@ -68,7 +68,6 @@ class Editorial(Base):
         editorial_existente.telefono = editorial_in.telefono
         editorial_existente.mail = editorial_in.mail
         
-
         session.commit()
         session.refresh(editorial_existente)
         session.close()

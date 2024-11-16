@@ -1,39 +1,46 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter
 from typing import List
-from models import ListaDePreciosModel  # Asegúrate de que este modelo esté en models.py
-from ListaDePrecios import ListaDePrecios  # Asegúrate de que la clase ListaDePrecios esté importada
-from database import SessionLocal  # Importa SessionLocal de database.py
-from sqlalchemy.orm import Session
-
+from models import ListaDePreciosModel, LibroConPrecioModel
+from ListaDePrecios import ListaDePrecios
+from sqlalchemy.orm import sessionmaker
+from Libro import Libro
 router = APIRouter()
 
-# Función para obtener una sesión de base de datos
-def get_db():
-    db = SessionLocal()  # Crear una nueva sesión
-    try:
-        yield db  # Usar la sesión en la ruta
-    finally:
-        db.close()  # Cerrar la sesión después de usarla
 
 # Endpoint POST para crear un nuevo precio
-@router.post("/listas_precios/nueva/", tags=["Listas de Precios"], summary="Crear una nueva lista de precios", description="Este endpoint crea una nueva lista de precios en la base de datos.")
-def crear_precio(precio: ListaDePreciosModel, db: Session = Depends(get_db)):
-    nuevo_precio = ListaDePrecios.crear_precio(
-        session=db,
-        id_editorial=precio.id_editorial,
-        id_libro=precio.id_libro,
-        precio=precio.precio
-    )
+@router.post("/lista_precios/nuevo/", tags=["Lista de Precios"], summary="Agrega un nuevo libro a la lista de precios", description="Este endpoint agrega un nuevo libro a la lista de precios, usando los id de editoriales y libros existentes.")
+def agregar_precio(nuevo_libro: ListaDePreciosModel):
 
-    # Agregar el nuevo precio a la sesión y hacer commit
-    db.add(nuevo_precio)
-    db.commit()  # Guarda los cambios en la base de datos
-    db.refresh(nuevo_precio)  # Actualiza el objeto nuevo_precio con los datos de la base de datos
+    ListaDePrecios.agregar_libro_a_lista_precios(nuevo_libro)
+    return {"message": "Precio agregado exitosamente"}
 
-    return {"message": "Precio creado exitosamente", "precio": nuevo_precio}
 
 # Endpoint GET para obtener todos los precios
-@router.get("/listas_precios/", response_model=List[ListaDePreciosModel], tags=["Listas de Precios"], summary="Obtener todos los precios", description="Este endpoint devuelve una lista de todos los precios registrados en la base de datos.")
-def obtener_precios(db: Session = Depends(get_db)):
-    precios = ListaDePrecios.mostrar_todos(db)
+@router.get("/lista_precios/", response_model=List[ListaDePreciosModel], tags=["Lista de Precios"], summary="Obtener todos los precios", description="Este endpoint devuelve una lista de todos los precios y de todas las editoriales registrados en la base de datos.")
+def obtener_lista_de_precios():
+    precios = ListaDePrecios.mostrar_todos()
     return precios
+
+
+# Endpoint GET para obtener libros y precios filtrando por editorial
+@router.get("/lista_precios/por_editorial/", response_model=List[LibroConPrecioModel], tags=["Lista de Precios"], description="Obtener todos los libros y precios de una editorial específica.")
+def obtener_libros_y_precios_por_editorial(id_editorial: int):
+    libros = ListaDePrecios.obtener_libros_por_editorial(id_editorial)
+    
+    # Formateamos la respuesta con los datos de los libros y precios
+    respuesta = []
+    for libro, precio in libros:
+        libro_con_precio = LibroConPrecioModel(
+            id_libro=libro.id_libro,
+            titulo=libro.titulo,
+            autor=libro.autor,
+            isbn=libro.isbn,
+            precio=precio,
+            stock=libro.stock,
+            id_genero=libro.id_genero
+        )
+        respuesta.append(libro_con_precio)    
+    
+    return respuesta
+
+

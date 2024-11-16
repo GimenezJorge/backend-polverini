@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from database import Base, engine
+from models import ClienteModel 
 
 # Defino la clase Cliente
 class Cliente(Base):
@@ -13,12 +14,12 @@ class Cliente(Base):
     direccion = Column(String(255))
 
     @classmethod
-    def registrar_cliente(cls, nombre: str, email: str = None, telefono: str = None, direccion: str = None):
+    def agregar_cliente(cls, cliente_in: ClienteModel):
         nuevo_cliente = cls(
-            nombre=nombre,
-            email=email,
-            telefono=telefono,
-            direccion=direccion
+            nombre=cliente_in.nombre,
+            email=cliente_in.email,
+            telefono=cliente_in.telefono,
+            direccion=cliente_in.direccion
         )
         session = sessionmaker(bind=engine)()
         session.add(nuevo_cliente)
@@ -39,25 +40,21 @@ class Cliente(Base):
         session = sessionmaker(bind=engine)()
         clientes = session.query(cls).all()
         session.close()
-        return clientes
+        return clientes  
 
     @classmethod
-    def modificar_cliente(cls, cliente_id: int, nombre: str = None, email: str = None, telefono: str = None, direccion: str = None):
+    def modificar_cliente(cls, cliente_id: int, cliente_in: ClienteModel):
         session = sessionmaker(bind=engine)()
         cliente_existente = session.query(cls).filter(cls.id_cliente == cliente_id).one_or_none()
         if not cliente_existente:
             session.close()
             raise Exception(f"Cliente con id {cliente_id} no encontrado")
         
-        if nombre is not None:
-            cliente_existente.nombre = nombre
-        if email is not None:
-            cliente_existente.email = email
-        if telefono is not None:
-            cliente_existente.telefono = telefono
-        if direccion is not None:
-            cliente_existente.direccion = direccion
-        
+        cliente_existente.nombre = cliente_in.nombre
+        cliente_existente.email = cliente_in.email
+        cliente_existente.telefono = cliente_in.telefono        
+        cliente_existente.direccion = cliente_in.direccion
+                        
         session.commit()
         session.refresh(cliente_existente)
         session.close()

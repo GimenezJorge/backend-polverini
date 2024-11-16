@@ -12,11 +12,10 @@ Microsoft Visual C++ Redistributable (version 14.40.33810.0)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import engine
-from endpoints_Editorial import router as api_router_editorial
-from endpoints_Cliente import router as api_router_cliente 
+from endpoints_Editorial import router as router_editorial
+from endpoints_Cliente import router as router_cliente 
 from endpoints_Genero import router as genero_router
-from endpoints_Libro import router as api_router_libro
+from endpoints_Libro import router as router_libro
 from endpoints_ListaDePrecios import router as lista_precios_router
 
 app = FastAPI()
@@ -25,7 +24,7 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://127.0.0.1:8000",
-    "http://127.0.0.1:5500",
+
 ]
 
 app.add_middleware(
@@ -37,8 +36,8 @@ app.add_middleware(
 )
 
 # Incluye los endpoints de api.py
-app.include_router(api_router_editorial)
-app.include_router(api_router_cliente)
+app.include_router(router_editorial)
+app.include_router(router_cliente)
 app.include_router(genero_router)
-app.include_router(api_router_libro)
+app.include_router(router_libro)
 app.include_router(lista_precios_router)

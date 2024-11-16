@@ -1,8 +1,8 @@
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import Column, Integer, String
 from database import engine, Base
+from models import GeneroModel
 
-# Defino la clase Genero
 class Genero(Base):
     __tablename__ = 'generos'
 
@@ -13,8 +13,8 @@ class Genero(Base):
     libros = relationship("Libro", back_populates="genero")
 
     @classmethod
-    def agregar_genero(cls, nombre: str):
-        nuevo_genero = cls(nombre=nombre)
+    def agregar_genero(cls, genero_in: GeneroModel):
+        nuevo_genero = cls(nombre=genero_in.nombre)
         session = sessionmaker(bind=engine)()
         session.add(nuevo_genero)
         session.commit()

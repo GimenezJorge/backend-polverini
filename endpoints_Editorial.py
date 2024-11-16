@@ -1,4 +1,3 @@
-from datetime import date
 from fastapi import APIRouter, HTTPException
 from typing import List
 from Editorial import Editorial
@@ -9,14 +8,7 @@ router = APIRouter()
 # Endpoint POST para agregar una editorial
 @router.post("/editoriales/nueva/", tags=["Editoriales"], summary="Crear una nueva editorial", description="Este endpoint crea una nueva editorial en la base de datos.")
 def agregar_editorial(editorial: EditorialModel):
-    Editorial.agregar_editorial(
-        nombre=editorial.nombre,
-        razon_social=editorial.razon_social,
-        cuit=editorial.cuit,
-        direccion=editorial.direccion,
-        telefono=editorial.telefono,
-        mail=editorial.mail
-    )
+    Editorial.agregar_editorial(editorial)
     return {"message": "Editorial creada exitosamente"}
 
 # Endpoint GET para obtener todas las editoriales

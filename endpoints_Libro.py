@@ -1,30 +1,18 @@
 from fastapi import APIRouter
-from models import LibroCreate  # Asegúrate de importar el modelo correcto
+from typing import List
+from models import LibroModel
 from Libro import Libro
-from models import LibroCreate  # Asegúrate de que ambas clases están importadas
+
 
 router = APIRouter()
 
 @router.post("/libros/nuevo/", tags=["Libros"], summary="Agregar un nuevo libro", description="Este endpoint permite agregar un nuevo libro a la base de datos.")
-async def agregar_libro(libro: LibroCreate):
-    try:
-        # Llamar al método agregar_libro de la clase Libro y pasar los parámetros correctos
-        nuevo_libro = Libro.agregar_libro(
-            titulo=libro.titulo,
-            autor=libro.autor,
-            isbn=libro.isbn,
-            precio=libro.precio,
-            stock=libro.stock,
-            id_genero=libro.id_genero
-        )
-        return {"message": "Libro agregado exitosamente", "id_libro": nuevo_libro.id_libro}
-    except Exception as e:
-        return {"error": str(e)}
+def agregar_libro(libro: LibroModel):
+    Libro.agregar_libro(libro)
+    return {"message": "Libro agregado exitosamente"}
 
-@router.get("/libros/", tags=["Libros"], description="Obtener todos los libros")
-async def mostrar_libros():
-    try:
-        libros = Libro.obtener_libros()
-        return libros
-    except Exception as e:
-        return {"error": str(e)}
+@router.get("/libros/", response_model=List[LibroModel], tags=["Libros"], description="Obtener todos los libros")
+def obtener_libros():
+    libros = Libro.mostrar_todos()
+    return libros
+
