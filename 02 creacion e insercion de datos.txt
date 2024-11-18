@@ -35,21 +35,24 @@ CREATE TABLE libros (
     FOREIGN KEY (id_genero) REFERENCES generos(id_genero)
 );
 
-CREATE TABLE compra_editorial (
-    id_compra_editorial INT PRIMARY KEY IDENTITY(1,1),
-    id_editorial INT,
+CREATE TABLE compra (
+    id_compra INT PRIMARY KEY IDENTITY(1,1),
+    id_editorial INT NULL,
+    nombre_editorial VARCHAR(255),
     fecha DATE,
-    FOREIGN KEY (id_editorial) REFERENCES editoriales(id_editorial)
+    total MONEY,
+    FOREIGN KEY (id_editorial) REFERENCES editoriales(id_editorial) ON DELETE SET NULL
 );
 
-
-CREATE TABLE detalle_compra_editorial (
-    id_detalle INT PRIMARY KEY IDENTITY(1,1),
-    id_compra_editorial INT,
-    id_libro INT,
+CREATE TABLE detalle_compra (
+    id_detalle_compra INT PRIMARY KEY IDENTITY(1,1),
+    id_compra INT,
+    id_libro INT NULL,
+    nombre_libro VARCHAR(255),
     cantidad INT,
-    FOREIGN KEY (id_compra_editorial) REFERENCES compra_editorial(id_compra_editorial),
-    FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
+    precio MONEY,  -- Agregada la columna precio
+    FOREIGN KEY (id_compra) REFERENCES compra(id_compra),
+    FOREIGN KEY (id_libro) REFERENCES libros(id_libro) ON DELETE SET NULL
 );
 
 CREATE TABLE lista_de_precios (
@@ -58,8 +61,9 @@ CREATE TABLE lista_de_precios (
     id_libro INT,
     precio MONEY,
     FOREIGN KEY (id_editorial) REFERENCES editoriales(id_editorial),
-    FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
+    FOREIGN KEY (id_libro) REFERENCES libros(id_libro),
 );
+
 
 CREATE TABLE venta_cliente (
     id_venta_cliente INT PRIMARY KEY IDENTITY(1,1),
@@ -95,6 +99,7 @@ CREATE TABLE detalle_carrito (
     FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
 );
 
+
 -- Insertar generos
 INSERT INTO generos (nombre)
 VALUES ('Ficción'), ('No Ficción'), ('Ciencia'), ('Historia'), ('Fantasía');
@@ -127,36 +132,34 @@ VALUES
     ('La sombra del viento', 'Carlos Ruiz Zafón', '978-8401399467', 22, 5);
 
 -- Insertar compras editoriales
-INSERT INTO compra_editorial (id_editorial, fecha)
+INSERT INTO compra (id_editorial, nombre_editorial, fecha, total)
 VALUES 
-    (1, '2024-01-12'),
-    (2, '2024-02-20'),
-    (3, '2024-03-15'),
-    (4, '2024-04-10'),
-    (5, '2024-05-05');
+    (1, 'Editorial Alianza', '2024-01-12', 8500.00),
+    (2, 'Editorial Sudamericana', '2024-02-20', 6000.00),
+    (3, 'Editorial Planeta', '2024-03-15', 4800.00),
+    (4, 'Editorial Siglo XXI', '2024-04-10', 8250.00);
 
--- Insertar detalle compra editorial
-INSERT INTO detalle_compra_editorial (id_compra_editorial, id_libro, cantidad)
+INSERT INTO detalle_compra (id_compra, id_libro, nombre_libro, cantidad)
 VALUES 
-    (1, 1, 10), 
-    (1, 2, 5),
-    (2, 3, 12),
-    (3, 4, 8),
-    (4, 5, 15);
+    (1, 1, 'El túnel', 10), 
+    (1, 2, 'Cien años de soledad', 5),
+    (2, 3, 'Breve historia de casi todo', 12),
+    (3, 4, 'El nombre del viento', 8),
+    (4, 5, 'La sombra del viento', 15);
 
 -- Insertar lista de precios
 INSERT INTO lista_de_precios (id_editorial, id_libro, precio)
 VALUES 
     (1, 1, 350.00),  -- Editorial Alianza
     (1, 2, 470.00),  -- Editorial Alianza
-    (2, 3, 530.00),  -- Editorial Sudamericana
+    (2, 3, 500.00),  -- Editorial Sudamericana
     (2, 4, 600.00),  -- Editorial Sudamericana
-    (3, 4, 620.00),  -- Editorial Planeta
-    (3, 5, 560.00),  -- Editorial Planeta
-    (4, 5, 590.00),  -- Editorial Siglo XXI
-    (5, 1, 360.00),  -- Editorial Eudeba
+    (3, 4, 600.00),  -- Editorial Planeta (mismo precio que Sudamericana)
+    (3, 5, 550.00),  -- Editorial Planeta
+    (4, 5, 550.00),  -- Editorial Siglo XXI (mismo precio que Planeta)
+    (5, 1, 350.00),  -- Editorial Eudeba (mismo precio que Alianza)
     (5, 2, 480.00),  -- Editorial Eudeba
-    (5, 3, 520.00);  -- Editorial Eudeba
+    (5, 3, 500.00);  -- Editorial Eudeba (mismo precio que Sudamericana)
 
 -- Insertar ventas clientes
 INSERT INTO venta_cliente (id_cliente, fecha, total)
@@ -193,3 +196,4 @@ VALUES
     (2, 3, 3),
     (3, 4, 2),
     (4, 5, 1);
+

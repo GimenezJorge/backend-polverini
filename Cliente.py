@@ -63,7 +63,9 @@ class Cliente(Base):
 
     @classmethod
     def eliminar_cliente(cls, cliente_id: int):
-        session = sessionmaker(bind=engine)()
+        #ACA VOY A TENER QUE IMPORTAR LA CLASE VENTA_CLIENTE CUANDO TENGO VENTA_CLIENTE.PY
+        session = sessionmaker(bind=engine)()        
+        #DESDE ACA VOY A TENER QUE BORRAR EL ID_CLIENTE DE LA TABLA VENTA_CLIENTE
         cliente = session.query(cls).filter_by(id_cliente=cliente_id).first()
         if cliente:
             session.delete(cliente)

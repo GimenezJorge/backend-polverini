@@ -43,7 +43,11 @@ class Editorial(Base):
 
     @classmethod
     def eliminar_editorial(cls, editorial_id: int):
+        from ListaDePrecios import ListaDePrecios
         session = sessionmaker(bind=engine)()
+        # Eliminar registros de lista_de_precios asociados con la editorial
+        session.query(ListaDePrecios).filter_by(id_editorial=editorial_id).delete()
+        # Eliminar la editorial
         editorial = session.query(cls).filter_by(id_editorial=editorial_id).first()
         if editorial:
             session.delete(editorial)

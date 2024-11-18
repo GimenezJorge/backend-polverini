@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from datetime import date
 
 class ClienteModel(BaseModel):
     id_cliente: int = None
@@ -69,7 +69,17 @@ class LibroConPrecioModel(BaseModel):
     precio: float = None
     stock: int = None
     id_genero: int = None
+    editorial: str = None  # Nuevo campo para el nombre de la editorial
 
     class Config:
         from_attributes = True
 
+class CompraModel(BaseModel):
+    id_compra: int = None
+    id_editorial: int = None
+    nombre_editorial: str = None
+    fecha: date = None
+    total: float = None
+
+    class Config:
+        from_attributes = True

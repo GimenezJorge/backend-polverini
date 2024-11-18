@@ -7,7 +7,7 @@ class Genero(Base):
     __tablename__ = 'generos'
 
     id_genero = Column(Integer, primary_key=True, autoincrement=True)
-    nombre = Column(String(100), nullable=False)
+    nombre = Column(String(100)  )
     
     # Relación con la tabla de libros
     libros = relationship("Libro", back_populates="genero")

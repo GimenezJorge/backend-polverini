@@ -1,8 +1,5 @@
 USE bdg3;
 
--- Primero, eliminar las tablas que tienen claves foráneas
--- El orden es importante para evitar conflictos con claves foráneas
-
 -- Eliminar detalle_venta_cliente
 DROP TABLE IF EXISTS detalle_venta_cliente;
 
@@ -12,11 +9,11 @@ DROP TABLE IF EXISTS venta_cliente;
 -- Eliminar lista_de_precios
 DROP TABLE IF EXISTS lista_de_precios;
 
--- Eliminar detalle_compra_editorial
-DROP TABLE IF EXISTS detalle_compra_editorial;
+-- Eliminar detalle_compra
+DROP TABLE IF EXISTS detalle_compra;
 
--- Eliminar compra_editorial
-DROP TABLE IF EXISTS compra_editorial;
+-- Eliminar compra
+DROP TABLE IF EXISTS compra;
 
 -- Eliminar detalle_carrito
 DROP TABLE IF EXISTS detalle_carrito;

@@ -9,11 +9,11 @@ class Libro(Base):
     __tablename__ = 'libros'
 
     id_libro = Column(Integer, primary_key=True, autoincrement=True)
-    titulo = Column(String(255), nullable=False)
-    autor = Column(String(100), nullable=False)
-    isbn = Column(String(20), unique=True, nullable=False)
-    stock = Column(Integer, nullable=False)
-    id_genero = Column(Integer, ForeignKey('generos.id_genero'), nullable=False)
+    titulo = Column(String(255))
+    autor = Column(String(100))
+    isbn = Column(String(20), unique=True)
+    stock = Column(Integer)
+    id_genero = Column(Integer, ForeignKey('generos.id_genero'))
 
     # Relación con la tabla Genero
     genero = relationship("Genero", back_populates="libros")
