@@ -12,5 +12,6 @@ class DetalleCompra(Base):
     nombre_libro = Column(String(255))
     cantidad = Column(Integer)
     precio = Column(Float)
+    
+    compra = relationship('Compra', back_populates='detalles')
 
-    compra = relationship("Compra", back_populates="detalle_compra")

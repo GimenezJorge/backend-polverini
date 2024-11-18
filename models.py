@@ -42,6 +42,19 @@ class LibroModel(BaseModel):
     class Config:
         from_attributes = True
 
+class LibroConPrecioModel(BaseModel):
+    id_libro: int = None
+    titulo: str = None
+    autor: str = None
+    isbn: str = None
+    precio: float = None
+    stock: int = None
+    id_genero: int = None
+    editorial: str = None  # Nuevo campo para el nombre de la editorial
+
+    class Config:
+        from_attributes = True
+
 # class LibroConGenero(BaseModel):
 #     id_libro: int = None
 #     titulo: str = None
@@ -58,19 +71,6 @@ class ListaDePreciosModel(BaseModel):
     id_editorial: int  = None
     id_libro: int = None
     precio: float = None
-
-    class Config:
-        from_attributes = True
-
-class LibroConPrecioModel(BaseModel):
-    id_libro: int = None
-    titulo: str = None
-    autor: str = None
-    isbn: str = None
-    precio: float = None
-    stock: int = None
-    id_genero: int = None
-    editorial: str = None  # Nuevo campo para el nombre de la editorial
 
     class Config:
         from_attributes = True
