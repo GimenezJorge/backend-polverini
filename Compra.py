@@ -3,6 +3,8 @@ from sqlalchemy.orm import sessionmaker, relationship
 from database import Base, engine
 from models import CompraModel
 from DetalleCompra import DetalleCompra
+from Editorial import Editorial
+from fastapi import HTTPException
 
 class Compra(Base):
     __tablename__ = 'compra'    
@@ -18,46 +20,30 @@ class Compra(Base):
     
 
 
+    @classmethod
+    def agregar_compra(cls, compra_in: CompraModel):
+        session = sessionmaker(bind=engine)()
 
+        # Verificar si la editorial existe
+        editorial = session.query(Editorial).filter(Editorial.id_editorial == compra_in.id_editorial).one_or_none()
+        if editorial is None:
+            session.close()
+            raise HTTPException(status_code=404, detail=f"Editorial con id {compra_in.id_editorial} no encontrada")
 
+        # Crear la compra con el nombre de la editorial obtenido
+        nueva_compra = cls(
+            id_editorial=compra_in.id_editorial,
+            nombre_editorial=editorial.nombre,  # Asignamos el nombre de la editorial
+            fecha=compra_in.fecha,
+            total=compra_in.total
+        )
 
+        session.add(nueva_compra)
+        session.commit()
+        session.refresh(nueva_compra)
+        session.close()
 
-
-
-
-
-
-
-
-    # @classmethod
-    # def agregar_compra(cls, compra_in: CompraModel):
-
-
-    #     # Crear el registro de la compra
-    #     nueva_compra = cls(
-    #         id_editorial=compra_in.id_editorial,
-    #         nombre_editorial=compra_in.nombre_editorial,
-    #         fecha=compra_in.fecha,
-    #         total=compra_in.total
-    #     )
-    #     session = sessionmaker(bind=engine)()
-    #     session.add(nueva_compra)
-    #     session.commit()
-    #     session.refresh(nueva_compra)  
-    #     session.close()  
-    #     return nueva_compra
-
-
-
-
-
-
-
-
-
-
-
-
+        return nueva_compra
 
 
 

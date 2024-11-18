@@ -91,7 +91,6 @@ class DetalleCompraModel(BaseModel):
 class CompraModel(BaseModel):
     id_compra: int = None
     id_editorial: int = None
-    nombre_editorial: str = None
     fecha: date = None
     total: float = None
     detalles: List[DetalleCompraModel] = []
