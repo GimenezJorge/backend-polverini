@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 from datetime import date
 
 class ClienteModel(BaseModel):
@@ -74,12 +75,26 @@ class LibroConPrecioModel(BaseModel):
     class Config:
         from_attributes = True
 
+# Modelo para DetalleCompra
+class DetalleCompraModel(BaseModel):
+    id_detalle_compra: int = None
+    id_libro: int = None
+    nombre_libro: str = None
+    cantidad: int = None
+    precio: float = None
+
+    class Config:
+        from_attributes = True
+
+
+# Modelo para Compra
 class CompraModel(BaseModel):
     id_compra: int = None
     id_editorial: int = None
     nombre_editorial: str = None
     fecha: date = None
     total: float = None
+    detalles: List[DetalleCompraModel] = []
 
     class Config:
         from_attributes = True
