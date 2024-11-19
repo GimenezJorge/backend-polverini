@@ -1,10 +1,10 @@
 USE bdg3;
 
--- Eliminar detalle_venta_cliente
-DROP TABLE IF EXISTS detalle_venta_cliente;
+-- Eliminar detalle_venta
+DROP TABLE IF EXISTS detalle_venta;
 
--- Eliminar venta_cliente
-DROP TABLE IF EXISTS venta_cliente;
+-- Eliminar venta
+DROP TABLE IF EXISTS venta;
 
 -- Eliminar lista_de_precios
 DROP TABLE IF EXISTS lista_de_precios;

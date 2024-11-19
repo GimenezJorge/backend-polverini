@@ -18,6 +18,7 @@ from endpoints_Genero import router as router_genero
 from endpoints_Libro import router as router_libro
 from endpoints_ListaDePrecios import router as router_lista_precios
 from endpoints_Compra import router as router_Compra
+from endpoints_Venta import router as router_Venta
 
 app = FastAPI()
 
@@ -43,3 +44,4 @@ app.include_router(router_genero)
 app.include_router(router_libro)
 app.include_router(router_lista_precios)
 app.include_router(router_Compra)
+app.include_router(router_Venta)

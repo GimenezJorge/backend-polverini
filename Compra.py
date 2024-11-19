@@ -1,10 +1,11 @@
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, joinedload
 from database import Base, engine
 from models import CompraModel
 from DetalleCompra import DetalleCompra
 from Editorial import Editorial
 from Libro import Libro
+from ListaDePrecios import ListaDePrecios  # Importar ListaDePrecios
 from fastapi import HTTPException
 
 class Compra(Base):
@@ -19,8 +20,6 @@ class Compra(Base):
     # Relación con DetalleCompra
     detalles = relationship("DetalleCompra", back_populates="compra")
     
-
-
     @classmethod
     def agregar_compra(cls, compra_in: CompraModel):
         session = sessionmaker(bind=engine)()
@@ -34,11 +33,10 @@ class Compra(Base):
         # Crear la compra con el nombre de la editorial obtenido
         nueva_compra = cls(
             id_editorial=compra_in.id_editorial,
-            nombre_editorial=editorial.nombre,  # Asignamos el nombre de la editorial
+            nombre_editorial=editorial.nombre, 
             fecha=compra_in.fecha,
             total=0  # Inicializamos el total en 0
         )
-
         session.add(nueva_compra)
         session.commit()
         session.refresh(nueva_compra)
@@ -54,61 +52,61 @@ class Compra(Base):
                 session.close()
                 raise HTTPException(status_code=404, detail=f"Libro con id {detalle.id_libro} no encontrado")
 
-            # Crear el detalle de la compra
+            # Obtener el precio del libro desde la tabla 'lista_de_precios'
+            
+            precio_libro = session.query(ListaDePrecios).filter(ListaDePrecios.id_libro == detalle.id_libro, ListaDePrecios.id_editorial == compra_in.id_editorial).one_or_none()
+
+            
+            if precio_libro is None:
+                session.close()
+                raise HTTPException(status_code=404, detail=f"Esa editorial no tiene el libro con id {detalle.id_libro}")
+
             detalle_compra = DetalleCompra(
                 id_compra=nueva_compra.id_compra,
                 id_libro=libro.id_libro,
-                nombre_libro=libro.titulo,  # Asignamos el nombre del libro
+                nombre_libro=libro.titulo,
                 cantidad=detalle.cantidad,
-                precio=detalle.precio
+                precio=precio_libro.precio  # Obtener el precio desde 'lista_de_precios'
             )
             session.add(detalle_compra)
+            total += detalle.cantidad * precio_libro.precio  # Acumulamos el precio total
 
-            # Calcular el total
-            total += detalle.cantidad * detalle.precio
-
-        # Asignamos el total calculado a la compra
+        # Asigno el total calculado a la compra
         nueva_compra.total = total
-
-        session.commit()  # Confirmamos los cambios en los detalles
+        session.commit()  
         session.close()
 
         return nueva_compra
 
+    @classmethod
+    def obtener_compras(cls):
+        session = sessionmaker(bind=engine)()
+        try:
+            # Obtener todas las compras con los detalles
+            compras = session.query(cls).options(joinedload(cls.detalles)).all()
+            
+            # Contar la cantidad de compras
+            cantidad_compras = len(compras)
+            
+            return {"cantidad_compras": cantidad_compras, "compras": compras}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            session.close()
 
-
-
-
-
-
-
-
-        # session.close()
-
-        # return nueva_compra
-
-
-
-
-
-
-        # # Agregar los detalles de la compra
-        # for detalle in compra_in.detalles:
-        #     # Buscar el libro por id_libro
-        #     libro = session.query(Libro).filter(Libro.id_libro == detalle.id_libro).first()
-        #     if libro:
-        #         # Crear el detalle de la compra
-        #         detalle_compra = DetalleCompra(
-        #             id_compra=nueva_compra.idcompra,
-        #             id_libro=libro.id_libro,
-        #             nombre_libro=libro.titulo,  # Usar el título del libro
-        #             cantidad=detalle.cantidad,
-        #             precio=detalle.precio
-        #         )
-        #         session.add(detalle_compra)
-
-        # session.commit()  # Confirmar los cambios
-
-
-
-
+    @classmethod
+    def obtener_compras_por_editorial(cls, id_editorial: int):
+        session = sessionmaker(bind=engine)()
+        try:
+            # Filtrar las compras por id_editorial
+            compras = session.query(cls).filter(cls.id_editorial == id_editorial).options(joinedload(cls.detalles)).all()
+            
+            # Obtener el total de compras
+            total_compras = len(compras)
+            
+            # Retornar el total primero y luego las compras
+            return {"total_compras": total_compras, "compras": compras}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            session.close()

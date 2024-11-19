@@ -77,11 +77,8 @@ class ListaDePreciosModel(BaseModel):
 
 # Modelo para DetalleCompra
 class DetalleCompraModel(BaseModel):
-    id_detalle_compra: int = None
     id_libro: int = None
-    nombre_libro: str = None
     cantidad: int = None
-    precio: float = None
 
     class Config:
         from_attributes = True
@@ -89,11 +86,29 @@ class DetalleCompraModel(BaseModel):
 
 # Modelo para Compra
 class CompraModel(BaseModel):
-    id_compra: int = None
     id_editorial: int = None
     fecha: date = None
-    total: float = None
-    detalles: List[DetalleCompraModel] = []
+    detalles: List[DetalleCompraModel]
 
     class Config:
         from_attributes = True
+
+# Modelo para DetalleVenta
+class DetalleVentaModel(BaseModel):
+    id_libro: int
+    cantidad: int
+    precio: float
+
+    class Config:
+        from_attributes = True
+
+# Modelo para Venta
+class VentaModel(BaseModel):
+    id_venta: int = None
+    id_cliente: int = None
+    fecha: date = None
+    total: float = None
+    detalles: List[DetalleVentaModel] = []
+
+    class Config:
+        from_attributes = True        
