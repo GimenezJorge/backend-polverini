@@ -36,6 +36,20 @@ class Cliente(Base):
         return cliente
 
     @classmethod
+    def obtener_por_nombre(cls, nombre: str):
+        session = sessionmaker(bind=engine)()
+        try:
+            clientes = (
+                session.query(cls)
+                .filter(cls.nombre.ilike(f"%{nombre}%"))
+                .all()
+            )
+            return clientes
+        finally:
+            session.close()
+
+
+    @classmethod
     def mostrar_todos(cls):
         session = sessionmaker(bind=engine)()
         clientes = session.query(cls).all()

@@ -17,6 +17,14 @@ def obtener_clientes():
     clientes = Cliente.mostrar_todos()
     return clientes
 
+# Endpoint GET para buscar clientes por nombre
+@router.get("/clientes/buscar/", response_model=List[ClienteModel], tags=["Clientes"], summary="Buscar clientes por nombre", description="Devuelve todos los clientes cuyo nombre coincida parcial o totalmente.")
+def buscar_clientes(nombre: str):
+    clientes = Cliente.obtener_por_nombre(nombre)
+    if not clientes:
+        raise HTTPException(status_code=404, detail="No se encontraron clientes con ese nombre")
+    return clientes
+
 # Endpoint GET para obtener un cliente por ID
 @router.get("/clientes/{cliente_id}", response_model=ClienteModel, tags=["Clientes"], summary="Obtener un cliente por ID", description="Este endpoint devuelve los datos de un cliente específico.")
 def obtener_cliente(cliente_id: int):
