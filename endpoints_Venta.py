@@ -25,3 +25,21 @@ async def obtener_ventas_por_cliente(id_cliente: int):
         return ventas
     except HTTPException as e:
         raise e
+
+from fastapi import Query
+from datetime import date
+
+@router.get(
+    "/ventas/filtrar/",
+    tags=["Ventas"],
+    summary="Filtrar ventas por fecha",
+    description="Permite filtrar ventas por fecha exacta, por rango, por año o por mes."
+)
+def filtrar_ventas(
+    fecha: date = Query(None),
+    desde: date = Query(None),
+    hasta: date = Query(None),
+    año: int = Query(None),
+    mes: int = Query(None)
+):
+    return Venta.obtener_ventas_por_fecha(fecha, desde, hasta, año, mes)

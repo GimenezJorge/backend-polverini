@@ -6,6 +6,8 @@ from Cliente import Cliente
 from Libro import Libro
 from DetalleVenta import DetalleVenta
 from fastapi import HTTPException
+from datetime import date
+from sqlalchemy import extract
 
 class Venta(Base):
     __tablename__ = 'venta'
@@ -107,5 +109,40 @@ class Venta(Base):
             return {"total_ventas": total_ventas, "ventas": ventas}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            session.close()
+
+    @classmethod
+    def obtener_ventas_por_fecha(cls, fecha: date = None, desde: date = None, hasta: date = None, año: int = None, mes: int = None):
+        session = sessionmaker(bind=engine)()
+        try:
+            query = session.query(cls).options(joinedload(cls.detalles))
+
+            # Fecha exacta
+            if fecha:
+                query = query.filter(cls.fecha == fecha)
+
+            # Rango de fechas
+            if desde:
+                query = query.filter(cls.fecha >= desde)
+            if hasta:
+                query = query.filter(cls.fecha <= hasta)
+
+            # Año
+            if año:
+                query = query.filter(extract("year", cls.fecha) == año)
+
+            # Mes dentro de un año
+            if año and mes:
+                query = query.filter(extract("month", cls.fecha) == mes)
+
+            ventas = query.all()
+            total_filtradas = len(ventas)
+
+            return {
+                "total_filtradas": total_filtradas,
+                "ventas": ventas
+            }
+
         finally:
             session.close()
