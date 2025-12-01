@@ -17,6 +17,14 @@ def obtener_generos():
     generos = Genero.obtener_todos()
     return generos
 
+# Endpoint GET para buscar géneros por nombre
+@router.get("/generos/buscar/", response_model=List[GeneroModel], tags=["Generos"], summary="Buscar géneros por nombre", description="Devuelve todos los géneros cuyo nombre coincida parcial o totalmente.")
+def buscar_generos(nombre: str):
+    generos = Genero.obtener_por_nombre(nombre)
+    if not generos:
+        raise HTTPException(status_code=404, detail="No se encontraron géneros con ese nombre")
+    return generos
+
 # Endpoint PUT para modificar un género
 @router.put("/generos/{id_genero}", tags=["Generos"], summary="Modificar un género", description="Este endpoint modifica el nombre de un género identificado por su ID.")
 def modificar_genero(id_genero: int, genero_in: GeneroModel):

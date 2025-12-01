@@ -57,3 +57,16 @@ class Genero(Base):
         session.commit()
         session.close()
         return True
+
+    @classmethod
+    def obtener_por_nombre(cls, nombre: str):
+        session = sessionmaker(bind=engine)()
+        try:
+            generos = (
+                session.query(cls)
+                .filter(cls.nombre.ilike(f"%{nombre}%"))
+                .all()
+            )
+            return generos
+        finally:
+            session.close()
