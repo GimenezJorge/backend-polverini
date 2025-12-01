@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from models import CompraModel
 from Compra import Compra
+from datetime import date
+from fastapi import Query
 
 router = APIRouter()
 
@@ -25,3 +27,18 @@ async def obtener_compras_por_editorial(id_editorial: int):
         return compras
     except HTTPException as e:
         raise e
+    
+@router.get(
+    "/compras/filtrar/",
+    tags=["Compras"],
+    summary="Filtrar compras por fecha",
+    description="Permite filtrar compras por fecha exacta, por rango, por año o por mes."
+)
+def filtrar_compras(
+    fecha: date = Query(None),
+    desde: date = Query(None),
+    hasta: date = Query(None),
+    año: int = Query(None),
+    mes: int = Query(None)
+):
+    return Compra.obtener_compras_por_fecha(fecha, desde, hasta, año, mes)

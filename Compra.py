@@ -7,6 +7,8 @@ from Editorial import Editorial
 from Libro import Libro
 from ListaDePrecios import ListaDePrecios  # Importar ListaDePrecios
 from fastapi import HTTPException
+from datetime import date
+from sqlalchemy import extract
 
 class Compra(Base):
     __tablename__ = 'compra'    
@@ -112,5 +114,33 @@ class Compra(Base):
             return {"total_compras": total_compras, "compras": compras}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            session.close()
+
+    @classmethod
+    def obtener_compras_por_fecha(cls, fecha: date = None, desde: date = None, hasta: date = None, año: int = None, mes: int = None):
+        session = sessionmaker(bind=engine)()
+        try:
+            query = session.query(cls).options(joinedload(cls.detalles))
+
+            if fecha:
+                query = query.filter(cls.fecha == fecha)
+
+            if desde:
+                query = query.filter(cls.fecha >= desde)
+            if hasta:
+                query = query.filter(cls.fecha <= hasta)
+
+            if año:
+                query = query.filter(extract("year", cls.fecha) == año)
+
+            if año and mes:
+                query = query.filter(extract("month", cls.fecha) == mes)
+
+            compras = query.all()
+            total_filtradas = len(compras)
+
+            return {"total_filtradas": total_filtradas, "compras": compras}
+
         finally:
             session.close()
