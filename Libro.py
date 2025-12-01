@@ -97,3 +97,17 @@ class Libro(Base):
         libros = session.query(cls).filter(cls.id_genero == id_genero).all()
         session.close()
         return libros
+
+    @classmethod
+    def obtener_por_nombre(cls, nombre: str):
+        session = sessionmaker(bind=engine)()
+        try:
+            libros = (
+                session.query(cls)
+                .filter(cls.titulo.isnot(None))             # <-- evita NULL
+                .filter(cls.titulo.ilike(f"%{nombre}%"))    # <-- busca coincidencia
+                .all()
+            )
+            return libros
+        finally:
+            session.close()

@@ -26,6 +26,14 @@ def obtener_libros_por_genero(id_genero: int):
 
     return libros
 
+# Endpoint GET para buscar libros por nombre
+@router.get("/libros/buscar/", response_model=List[LibroModel], tags=["Libros"], summary="Buscar libros por nombre", description="Devuelve todos los libros cuyo nombre coincida parcial o totalmente.")
+def buscar_libros(nombre: str):
+    libros = Libro.obtener_por_nombre(nombre)
+    if not libros:
+        raise HTTPException(status_code=404, detail="No se encontraron libros con ese nombre")
+    return libros
+
 @router.put("/libros/{id_libro}", tags=["Libros"], summary="Modificar un libro", description="Modifica los datos de un libro identificado por su ID.")
 def modificar_libro(id_libro: int, libro_in: LibroModel):
     resultado = Libro.modificar_libro(id_libro, libro_in)
