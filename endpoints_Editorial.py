@@ -17,6 +17,14 @@ def obtener_editoriales():
     editoriales = Editorial.mostrar_todos()
     return editoriales
 
+# Endpoint GET para buscar editoriales por nombre
+@router.get("/editoriales/buscar/", response_model=List[EditorialModel], tags=["Editoriales"], summary="Buscar editoriales por nombre", description="Devuelve todas las editoriales cuyo nombre coincida parcial o totalmente.")
+def buscar_editoriales(nombre: str):
+    editoriales = Editorial.obtener_por_nombre(nombre)
+    if not editoriales:
+        raise HTTPException(status_code=404, detail="No se encontraron editoriales con ese nombre")
+    return editoriales
+
 # Endpoint PUT para modificar una editorial
 @router.put("/editoriales/{editorial_id}", tags=["Editoriales"], summary="Modificar una editorial", description="Este endpoint modifica los datos de una editorial específica identificada por su ID.")
 def modificar_editorial(editorial_id: int, editorial_in: EditorialModel):

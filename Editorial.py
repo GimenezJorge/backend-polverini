@@ -82,3 +82,17 @@ class Editorial(Base):
             direccion=editorial_existente.direccion,
             telefono=editorial_existente.telefono
         )
+
+    @classmethod
+    def obtener_por_nombre(cls, nombre: str):
+        session = sessionmaker(bind=engine)()
+        try:
+            editoriales = (
+                session.query(cls)
+                .filter(cls.nombre.ilike(f"%{nombre}%"))
+                .all()
+            )
+            return editoriales
+        finally:
+            session.close()
+

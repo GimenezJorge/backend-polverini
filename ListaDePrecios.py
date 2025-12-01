@@ -43,8 +43,20 @@ class ListaDePrecios(Base):
     @classmethod
     def mostrar_todos(cls):
         session = sessionmaker(bind=engine)()
-        lista_de_precios = session.query(cls).all() 
-        return lista_de_precios
+        try:
+            lista = session.query(cls).all()
+
+            # Filtrar las filas inválidas (con NULL)
+            lista_filtrada = [
+                item for item in lista 
+                if item.id_libro is not None and item.id_editorial is not None
+            ]
+
+            return lista_filtrada
+        finally:
+            session.close()
+
+
 
     @classmethod
     def obtener_libros_por_editorial(cls, id_editorial: int):
@@ -96,22 +108,6 @@ class ListaDePrecios(Base):
             .join(ListaDePrecios, ListaDePrecios.id_libro == Libro.id_libro)
             .join(Editorial, Editorial.id_editorial == ListaDePrecios.id_editorial)
             .filter(ListaDePrecios.precio == precio)
-            .all()
-        )
-        session.close()
-        return libros
-
-
-    @classmethod
-    def obtener_libros_por_precio_minimo(cls, precio_minimo: float):
-        session = sessionmaker(bind=engine)()
-        
-        # Obtiene los libros con precios mayores al precio especificado
-        libros = (
-            session.query(Libro, ListaDePrecios.precio, Editorial.nombre)
-            .join(ListaDePrecios, ListaDePrecios.id_libro == Libro.id_libro)
-            .join(Editorial, Editorial.id_editorial == ListaDePrecios.id_editorial)
-            .filter(ListaDePrecios.precio >= precio_minimo)
             .all()
         )
         session.close()

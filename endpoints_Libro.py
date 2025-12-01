@@ -16,6 +16,16 @@ def obtener_libros():
     libros = Libro.mostrar_todos()
     return libros
 
+# Obtener libros por género
+@router.get("/libros/genero/{id_genero}", tags=["Libros"], summary="Obtener libros por género", description="Devuelve una lista de libros que pertenecen al género indicado.")
+def obtener_libros_por_genero(id_genero: int):
+    libros = Libro.obtener_por_genero(id_genero)
+
+    if not libros:
+        raise HTTPException(status_code=404, detail=f"No hay libros con el género {id_genero}")
+
+    return libros
+
 @router.put("/libros/{id_libro}", tags=["Libros"], summary="Modificar un libro", description="Modifica los datos de un libro identificado por su ID.")
 def modificar_libro(id_libro: int, libro_in: LibroModel):
     resultado = Libro.modificar_libro(id_libro, libro_in)
@@ -36,13 +46,3 @@ def eliminar_libro(id_libro: int):
         raise HTTPException(status_code=404, detail=f"Libro con id {id_libro} no encontrado")
 
     return {"message": "Libro eliminado correctamente"}
-
-# Obtener libros por género
-@router.get("/libros/genero/{id_genero}", tags=["Libros"], summary="Obtener libros por género", description="Devuelve una lista de libros que pertenecen al género indicado.")
-def obtener_libros_por_genero(id_genero: int):
-    libros = Libro.obtener_por_genero(id_genero)
-
-    if not libros:
-        raise HTTPException(status_code=404, detail=f"No hay libros con el género {id_genero}")
-
-    return libros

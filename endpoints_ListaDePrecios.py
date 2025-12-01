@@ -92,28 +92,6 @@ def obtener_libros_y_precio_por_precio(precio: float):
     
     return respuesta
 
-# Endpoint GET para obtener libros y precios mayores a un precio específico
-@router.get("/lista_precios/por_precio_minimo/", response_model=List[LibroConPrecioModel], tags=["Lista de Precios"], summary="Obtener todos los libros, indicando el precio minimo",description="Obtener todos los libros cuyo precio sea mayor o igual al valor especificado.")
-def obtener_libros_y_precio_por_precio_minimo(precio: float):
-    libros = ListaDePrecios.obtener_libros_por_precio_minimo(precio)
-    
-    respuesta = []
-    
-    for libro, precio, editorial in libros:
-        libro_con_precio = LibroConPrecioModel(
-            id_libro=libro.id_libro,
-            titulo=libro.titulo,
-            autor=libro.autor,
-            isbn=libro.isbn,
-            stock=libro.stock,
-            id_genero=libro.id_genero,
-            precio=precio,
-            editorial=editorial, 
-        )
-        respuesta.append(libro_con_precio)
-    
-    return respuesta
-
 # Endpoint GET para obtener libros y precios menores a un precio específico
 @router.get("/lista_precios/por_precio_maximo/", response_model=List[LibroConPrecioModel], tags=["Lista de Precios"], summary="Obtener todos los libros, indicando el precio maximo",description="Obtener todos los libros cuyo precio sea menor o igual al valor especificado.")
 def obtener_libros_y_precio_por_precio_maximo(precio: float):
