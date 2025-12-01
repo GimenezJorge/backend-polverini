@@ -49,3 +49,51 @@ class Libro(Base):
         libros = session.query(cls).all()
         session.close()
         return libros
+
+    @classmethod
+    def modificar_libro(cls, id_libro: int, libro_in: LibroModel):
+        session = sessionmaker(bind=engine)()
+        libro = session.query(cls).filter(cls.id_libro == id_libro).one_or_none()
+
+        if not libro:
+            session.close()
+            return False
+
+        # Verifico que el género exista
+        from Genero import Genero
+        genero = session.query(Genero).filter(Genero.id_genero == libro_in.id_genero).one_or_none()
+        if not genero:
+            session.close()
+            return "genero_invalido"
+
+        libro.titulo = libro_in.titulo
+        libro.autor = libro_in.autor
+        libro.isbn = libro_in.isbn
+        libro.stock = libro_in.stock
+        libro.id_genero = libro_in.id_genero
+
+        session.commit()
+        session.close()
+        return True
+
+
+    @classmethod
+    def eliminar_libro(cls, id_libro: int):
+        session = sessionmaker(bind=engine)()
+        libro = session.query(cls).filter(cls.id_libro == id_libro).one_or_none()
+
+        if not libro:
+            session.close()
+            return False
+
+        session.delete(libro)
+        session.commit()
+        session.close()
+        return True
+
+    @classmethod
+    def obtener_por_genero(cls, id_genero: int):
+        session = sessionmaker(bind=engine)()
+        libros = session.query(cls).filter(cls.id_genero == id_genero).all()
+        session.close()
+        return libros

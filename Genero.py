@@ -28,3 +28,32 @@ class Genero(Base):
         generos = session.query(cls).all()
         session.close()
         return generos
+
+    @classmethod
+    def modificar_genero(cls, id_genero: int, genero_in: GeneroModel):
+        session = sessionmaker(bind=engine)()
+        genero = session.query(cls).filter(cls.id_genero == id_genero).one_or_none()
+
+        if not genero:
+            session.close()
+            return False
+
+        genero.nombre = genero_in.nombre
+        session.commit()
+        session.close()
+        return True
+
+
+    @classmethod
+    def eliminar_genero(cls, id_genero: int):
+        session = sessionmaker(bind=engine)()
+        genero = session.query(cls).filter(cls.id_genero == id_genero).one_or_none()
+
+        if not genero:
+            session.close()
+            return False
+
+        session.delete(genero)
+        session.commit()
+        session.close()
+        return True
