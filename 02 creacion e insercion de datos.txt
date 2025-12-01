@@ -85,24 +85,6 @@ CREATE TABLE detalle_venta (
     FOREIGN KEY (id_libro) REFERENCES libros(id_libro) ON DELETE SET NULL
 );
 
-CREATE TABLE carrito (
-    id_carrito INT PRIMARY KEY IDENTITY(1,1),
-    id_cliente INT,
-    fecha DATE,
-    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
-);
-
-
-CREATE TABLE detalle_carrito (
-    id_detalle INT PRIMARY KEY IDENTITY(1,1),
-    id_carrito INT,
-    id_libro INT,
-    cantidad INT,
-    FOREIGN KEY (id_carrito) REFERENCES carrito(id_carrito),
-    FOREIGN KEY (id_libro) REFERENCES libros(id_libro)
-);
-
-
 -- Insertar generos
 INSERT INTO generos (nombre)
 VALUES ('Ficción'), ('No Ficción'), ('Ciencia'), ('Historia'), ('Fantasía');
@@ -187,22 +169,4 @@ VALUES
     (5, 3, 'Breve historia de casi todo', 2, 200.00),
     (6, 5, 'La sombra del viento', 1, 650.00);
 
-
--- Insertar carritos
-INSERT INTO carrito (id_cliente, fecha)
-VALUES 
-    (1, '2024-07-01'),
-    (2, '2024-07-02'),
-    (3, '2024-07-03'),
-    (4, '2024-07-04'),
-    (5, '2024-07-05');
-
--- Insertar detalle carrito
-INSERT INTO detalle_carrito (id_carrito, id_libro, cantidad)
-VALUES 
-    (1, 1, 2),
-    (1, 2, 1),
-    (2, 3, 3),
-    (3, 4, 2),
-    (4, 5, 1);
 

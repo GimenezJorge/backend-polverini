@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 # Aquí defines tu cadena de conexión
-server = r'DESKTOP-9IIVD9P\SQLEXPRESS'
+server = r'JLG\SQLEXPRESS'
 database = 'bdg3'
 
 connection_string = (

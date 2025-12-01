@@ -15,12 +15,6 @@ DROP TABLE IF EXISTS detalle_compra;
 -- Eliminar compra
 DROP TABLE IF EXISTS compra;
 
--- Eliminar detalle_carrito
-DROP TABLE IF EXISTS detalle_carrito;
-
--- Eliminar carrito
-DROP TABLE IF EXISTS carrito;
-
 -- Eliminar libros
 DROP TABLE IF EXISTS libros;
 

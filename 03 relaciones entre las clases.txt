@@ -4,13 +4,9 @@ DetalleCompraEditorial (N) ↔ Libro (1)
 ListaDePrecios (1) ↔ Editorial (1)
 ListaDePrecios (N) ↔ Libro (1)
 Libro (N) ↔ Genero (1)
-Libro (N) ↔ DetalleCarrito (1)
-DetalleCarrito (N) ↔ Carrito (1)
-Carrito (1) ↔ VentaCliente (1)
 Libro (1) ↔ DetalleVentaCliente (N)
 DetalleVentaCliente (N) ↔ VentaCliente (1)
 VentaCliente (N) ↔ Cliente (1)
-Carrito (N) ↔ Cliente (1)
 
 orden de creacion:
 Cliente
@@ -20,7 +16,5 @@ Libro
 ListaDePrecios
 CompraEditorial
 DetalleCompraEditorial
-Carrito
-DetalleCarrito
 VentaCliente
 DetalleVentaCliente

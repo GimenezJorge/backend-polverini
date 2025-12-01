@@ -1,0 +1,50 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Byte-compiled / optimized / DLL files
+*.dll
+*.dylib
+*.exe
+
+# Distribution / packaging
+build/
+dist/
+wheels/
+pip-wheel-metadata/
+
+# Logs
+*.log
+
+# --- FastAPI / Uvicorn ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- VSCode ---
+.vscode/
+*.code-workspace
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- PyCharm ---
+.idea/
+
+# --- Other ---
+*.cache/

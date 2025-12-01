@@ -4,7 +4,7 @@ from Venta import Venta
 
 router = APIRouter()
 
-@router.post("/ventas/nueva/", tags=["Ventas"], summary="Registrar una nueva venta", description="Este endpoint registra una nueva venta y sus detalles. Para agregar libros, indicar 'id_libro', 'cantidad' y 'precio'.")
+@router.post("/ventas/nueva/", tags=["Ventas"], summary="Registrar una nueva venta", description="Este endpoint registra una nueva venta y sus detalles. Para agregar libros, indicar 'id_libro', 'cantidad' y 'precio'. dentro de 'Detalles'")
 def agregar_venta(venta: VentaModel):
     Venta.agregar_venta(venta)
     return {"message": "Venta registrada exitosamente"}
