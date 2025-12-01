@@ -102,7 +102,7 @@ class DetalleVentaModel(BaseModel):
     class Config:
         from_attributes = True
 
-# Modelo para Venta
+# Modelo para mostrar Venta
 class VentaModel(BaseModel):
     id_venta: int = None
     id_cliente: int = None
@@ -112,3 +112,12 @@ class VentaModel(BaseModel):
 
     class Config:
         from_attributes = True        
+
+# Modelo para CREAR una venta (entrada del POST)
+class VentaCreateModel(BaseModel):
+    id_cliente: int
+    fecha: date
+    detalles: List[DetalleVentaModel]
+
+    class Config:
+        from_attributes = True

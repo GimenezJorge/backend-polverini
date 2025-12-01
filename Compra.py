@@ -61,6 +61,10 @@ class Compra(Base):
                 session.close()
                 raise HTTPException(status_code=404, detail=f"Esa editorial no tiene el libro con id {detalle.id_libro}")
 
+            # Aumentar stock porque se está comprando al proveedor
+            libro.stock += detalle.cantidad
+            session.commit()
+
             detalle_compra = DetalleCompra(
                 id_compra=nueva_compra.id_compra,
                 id_libro=libro.id_libro,

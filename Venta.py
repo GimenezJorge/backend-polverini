@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship, joinedload
 from database import Base, engine
-from models import VentaModel
+from models import VentaCreateModel
 from Cliente import Cliente
 from Libro import Libro
 from DetalleVenta import DetalleVenta
@@ -20,7 +20,7 @@ class Venta(Base):
     detalles = relationship("DetalleVenta", back_populates="venta")
     
     @classmethod
-    def agregar_venta(cls, venta_in: VentaModel):
+    def agregar_venta(cls, venta_in: VentaCreateModel):
         session = sessionmaker(bind=engine)()
 
         # Buscar el cliente basado en id_cliente
@@ -50,6 +50,15 @@ class Venta(Base):
             if libro is None:
                 session.close()
                 raise HTTPException(status_code=404, detail=f"Libro con id {detalle.id_libro} no encontrado")
+
+            # Verificar stock suficiente
+            if libro.stock < detalle.cantidad:
+                session.close()
+                raise HTTPException(status_code=400, detail=f"Stock insuficiente para el libro '{libro.titulo}'")
+
+            # Descontar stock
+            libro.stock -= detalle.cantidad
+            session.commit()
 
             detalle_venta = DetalleVenta(
                 id_venta=nueva_venta.id_venta,
